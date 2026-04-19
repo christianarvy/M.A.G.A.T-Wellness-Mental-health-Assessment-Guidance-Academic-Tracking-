@@ -101,7 +101,7 @@ void loadingTransition(const string& message, int seconds)
 // FILE HANDLING & CREATION
 void initializeFiles()
 {
-    const char* files[] = {"students.dat", "cases.dat", "counselors.dat", "admins.dat"};
+    const char* files[] = {"students", "cases", "counselors", "admins"};
    
     for (const char* file : files)
     {
@@ -113,7 +113,7 @@ void initializeFiles()
             createFile.close();
            
             // Seed Admin (Ma. Leonila V. Urrea)
-            if (strcmp(file, "admins.dat") == 0)
+            if (strcmp(file, "admins") == 0)
             {
                 ofstream adminFile(file, ios::binary | ios::app);
                 // Updated Username and Password
@@ -124,7 +124,7 @@ void initializeFiles()
             }
            
             // Seed Counselors based on specific list
-            if (strcmp(file, "counselors.dat") == 0)
+            if (strcmp(file, "counselors") == 0)
             {
                 ofstream counselorFile(file, ios::binary | ios::app);
                
@@ -171,7 +171,7 @@ void initializeFiles()
 
 
             // Seed default Student
-            if (strcmp(file, "students.dat") == 0)
+            if (strcmp(file, "students") == 0)
             {
                 ofstream studentFile(file, ios::binary | ios::app);
                 // Updated assigned counselor to match Jayson's new username
@@ -487,7 +487,7 @@ void adminAddStudent()
     cout << "Assign to Counselor (Enter Username): ";
     cin.getline(newStudent.assignedCounselor, 20);
    
-    ofstream outFile("students.dat", ios::binary | ios::app);
+    ofstream outFile("students", ios::binary | ios::app);
     outFile.write(reinterpret_cast<char*>(&newStudent), sizeof(Student));
     outFile.close();
    
@@ -521,7 +521,7 @@ void adminAddCounselor()
     cout << "Enter Department/Specialty: ";
     cin.getline(newCounselor.specialty, 100);
    
-    ofstream outFile("counselors.dat", ios::binary | ios::app);
+    ofstream outFile("counselors", ios::binary | ios::app);
     outFile.write(reinterpret_cast<char*>(&newCounselor), sizeof(Counselor));
     outFile.close();
    
@@ -546,7 +546,7 @@ void adminViewCounselors() {
     cout << "------------------------------------------------------------------------------------------------------------------------" << endl;
 
 
-    ifstream file("counselors.dat", ios::binary | ios::in);
+    ifstream file("counselors", ios::binary | ios::in);
    
     if (!file) {
         cout << "\n [ERROR] Counselor database not found." << endl;
@@ -699,7 +699,7 @@ void counselorDashboard(Counselor currentCounselor)
                 cout << "               YOUR ASSIGNED CASES                " << endl;
                 cout << "==================================================" << endl;
                
-                ifstream studentFile("students.dat", ios::binary);
+                ifstream studentFile("students", ios::binary);
                 Student tempStudent;
                 int caseCount = 0;
                
@@ -760,12 +760,12 @@ void counselorDashboard(Counselor currentCounselor)
         cout << "\n[5] DATE (MM/DD/YYYY): ";
         cin.getline(newCase.date, 20);
 
-        // Append to cases.dat
-        ofstream outFile("cases.dat", ios::binary | ios::app);
+        // Append to cases
+        ofstream outFile("cases", ios::binary | ios::app);
         if (outFile) {
             outFile.write(reinterpret_cast<char*>(&newCase), sizeof(Case));
             outFile.close();
-            cout << "\n[SYSTEM] Saving findings to cases.dat... Success." << endl;
+            cout << "\n[SYSTEM] Saving findings to cases... Success." << endl;
         }
 
         // --- IDEA B: PROFESSIONAL OVERRIDE ---
@@ -774,8 +774,8 @@ void counselorDashboard(Counselor currentCounselor)
         cout << ">> Enter new Professional Stress Level (1-10): ";
         cin >> professionalStressLevel;
         
-        // In-place Binary File Update for students.dat
-        fstream studentFile("students.dat", ios::in | ios::out | ios::binary);
+        // In-place Binary File Update for students
+        fstream studentFile("students", ios::in | ios::out | ios::binary);
         Student tempStud;
         bool studentFound = false;
 
@@ -797,9 +797,9 @@ void counselorDashboard(Counselor currentCounselor)
         }
 
         if(studentFound) {
-            cout << "[SYSTEM] Student stressLevel updated to " << professionalStressLevel << " in students.dat." << endl;
+            cout << "[SYSTEM] Student stressLevel updated to " << professionalStressLevel << " in students." << endl;
         } else {
-            cout << "[ERROR] Student ID not found in students.dat." << endl;
+            cout << "[ERROR] Student ID not found in students." << endl;
         }
 
         cout << "\nPress Enter to return to Dashboard...";
@@ -822,7 +822,7 @@ void counselorDashboard(Counselor currentCounselor)
         cout << "Enter Student ID (SN) to pull history: ";
         cin >> searchID;
 
-        ifstream inFile("cases.dat", ios::binary);
+        ifstream inFile("cases", ios::binary);
         if (!inFile) {
             cout << "[SYSTEM] No history records found." << endl;
             break;
@@ -862,7 +862,7 @@ void counselorDashboard(Counselor currentCounselor)
         cout << "              ACTIVE SESSION QUEUE                " << endl;
         cout << "==================================================" << endl;
 
-        ifstream inFile("appointments.dat", ios::binary);
+        ifstream inFile("appointments", ios::binary);
         if (!inFile) {
             cout << "[System] No appointments or emergencies found." << endl;
             break;
@@ -907,11 +907,11 @@ void counselorDashboard(Counselor currentCounselor)
         loadingTransition("Sorting Data", 1);
         clearScreen();
         cout << "==================================================" << endl;
-        cout << "              WELLNESS PRIORITY LIST              " << endl;
+        cout << "                WELLNESS PRIORITY LIST            " << endl;
         cout << "==================================================" << endl;
 
         // Count how many students exist
-        ifstream countFile("students.dat", ios::binary);
+        ifstream countFile("students", ios::binary);
         if (!countFile) {
             cout << "[Error] No student data found." << endl;
             break;
@@ -1048,7 +1048,7 @@ bool adminLogin(Admin& loggedInAdmin)
         cout << "Password: ";
         cin >> inputPass;
        
-        ifstream adminFile("admins.dat", ios::binary);
+        ifstream adminFile("admins", ios::binary);
         Admin tempAdmin;
        
         while (adminFile.read(reinterpret_cast<char*>(&tempAdmin), sizeof(Admin))) {
@@ -1100,7 +1100,7 @@ bool counselorLogin(Counselor& loggedInCounselor)
         cout << "Password: ";
         cin >> inputPass;
        
-        ifstream counselorFile("counselors.dat", ios::binary);
+        ifstream counselorFile("counselors", ios::binary);
         Counselor tempCounselor;
        
         while (counselorFile.read(reinterpret_cast<char*>(&tempCounselor), sizeof(Counselor)))
@@ -1170,7 +1170,7 @@ void studentLogin()
         cout << "Password: ";
         cin >> inputPass;
        
-        ifstream studentFile("students.dat", ios::binary);
+        ifstream studentFile("students", ios::binary);
         vector<Student> students;
         Student tempStudent;
        
