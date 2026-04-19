@@ -64,7 +64,14 @@ struct Appointment {
     char type;              // 'E' for Emergency, 'B' for Booking
 };
 
-
+struct Appointments
+{
+    long long studentID;
+    char counselorUsername[20];
+    char date[20];    // e.g., "2023-11-20"
+    char time[20];    // e.g., "10:00 AM"
+    char reason[100]; // e.g., "Academic Stress"
+};
 
 
 // HELPER FUNCTIONS
@@ -99,10 +106,10 @@ void loadingTransition(const string& message, int seconds)
 
 
 // FILE HANDLING & CREATION
-void initializeFiles()
 {
-    const char* files[] = {"students.dat", "cases.dat", "counselors.dat", "admins.dat"};
-   
+    
+    const char* files[] = {"students.dat", "cases.dat", "counselors.dat", "admins.dat", "appointments.dat"};
+    
     for (const char* file : files)
     {
         ifstream checkFile(file, ios::binary);
@@ -111,24 +118,22 @@ void initializeFiles()
             ofstream createFile(file, ios::binary);
             cout << "[SYSTEM] Created missing database file: " << file << endl;
             createFile.close();
-           
+            
             // Seed Admin (Ma. Leonila V. Urrea)
             if (strcmp(file, "admins.dat") == 0)
             {
                 ofstream adminFile(file, ios::binary | ios::app);
-                // Updated Username and Password
                 Admin defaultAdmin = {"leonila_urrea", "AdminPass123", "Ma. Leonila V. Urrea"};
                 adminFile.write(reinterpret_cast<char*>(&defaultAdmin), sizeof(Admin));
                 adminFile.close();
                 cout << "[SYSTEM] Default admin account created." << endl;
             }
-           
+            
             // Seed Counselors based on specific list
             if (strcmp(file, "counselors.dat") == 0)
             {
                 ofstream counselorFile(file, ios::binary | ios::app);
-               
-                // Updated Usernames based on real names and unique passwords
+                
                 Counselor defaultCounselors[5] = {
                     {"antonio_postrado", "Antonio@123", "Antonio C. Postrado Jr.", "Academic, Emotional, Career"},
                     {"jayson_parena", "Jayson@123", "Jayson S. Parena", "Academic, Emotional, Career"},
@@ -137,52 +142,19 @@ void initializeFiles()
                     {"jovine_delacruz", "Jovine@123", "Jovine Dimple L. Dela Cruz", "Administrative Support"}
                 };
 
-
-
-
-
-
-
-
-
-
-
                 for (int i = 0; i < 5; i++) {
                     counselorFile.write(reinterpret_cast<char*>(&defaultCounselors[i]), sizeof(Counselor));
                 }
-               
+                
                 counselorFile.close();
                 cout << "[SYSTEM] Staff counselor accounts seeded." << endl;
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             // Seed default Student
             if (strcmp(file, "students.dat") == 0)
             {
                 ofstream studentFile(file, ios::binary | ios::app);
-                // Updated assigned counselor to match Jayson's new username
-               Student students[] = {
-
-
-
-
-
-
-
+                Student students[] = {
 
     // ===== FIRST YEAR =====
     {20131155389LL, "macal01", "Macalintal, Lev Ryan F.", 1, 1, "jayson_parena"},
@@ -206,13 +178,6 @@ void initializeFiles()
     {20251129609LL, "rata19", "Rata, Rean May", 1, 1, "jayson_parena"},
     {20231128975LL, "yamb20", "Yambao, Zuriel Ethan P.", 1, 1, "jayson_parena"},
 
-
-
-
-
-
-
-
     // ===== SECOND YEAR =====
     {20241113019LL, "ranc21", "Rance, Princess Nicole R.", 2, 1, "antonio_postrado"},
     {20241102346LL, "alde22", "Alde, Patrick P.", 2, 1, "antonio_postrado"},
@@ -235,13 +200,6 @@ void initializeFiles()
     {20241124674LL, "adam39", "Adame, Jennilie A.", 2, 1, "antonio_postrado"},
     {20221115635LL, "ogue40", "Oguez, John Meynaro R.", 2, 1, "antonio_postrado"},
 
-
-
-
-
-
-
-
     // ===== THIRD YEAR =====
     {20231110057LL, "coco41", "Coco, James H.", 3, 1, "janine_bautista"},
     {20131147803LL, "pine42", "Pineda, Franz Luis", 3, 1, "janine_bautista"},
@@ -263,13 +221,6 @@ void initializeFiles()
     {20211105452LL, "dial58", "Dialino, Rny Marc A.", 3, 1, "janine_bautista"},
     {20231135618LL, "bayo59", "Bayona, Ralph", 3, 1, "janine_bautista"},
     {20231114933LL, "simb60", "Simbulan, Anton Francis J.", 3, 1, "janine_bautista"},
-
-
-
-
-
-
-
 
     // ===== FOURTH YEAR =====
     {20221129620LL, "cruz61", "Cruz, Fyi James J.", 4, 1, "arnold_desilva"},
@@ -294,23 +245,10 @@ void initializeFiles()
     {20221131038LL, "san80", "Santos, Maria", 4, 1, "arnold_desilva"}
 };
 
-
-
-
-
-
-
-
-int numStudents = sizeof(students) / sizeof(Student);
-    for (int i = 0; i < numStudents; i++) {
-    // This writes the student data to a single line, separated by spaces and a pipe
-    studentFile << students[i].studentID << " "
-                << students[i].password << " "
-                << students[i].name << "|"
-                << students[i].yearLevel << " "
-                << students[i].stressLevel << " "
-                << students[i].assignedCounselor << endl;
-    }
+                int numStudents = sizeof(students) / sizeof(Student);
+                for (int i = 0; i < numStudents; i++) {
+                    studentFile.write(reinterpret_cast<char*>(&students[i]), sizeof(Student));
+                }
                 studentFile.close();
                 cout << "[SYSTEM] Default student account created." << endl;
             }
