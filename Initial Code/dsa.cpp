@@ -64,6 +64,8 @@ struct Appointment
 };
 
 
+
+
 // HELPER FUNCTIONS
 // Cross-platform screen clear (detects if you are on Windows or Mac/Linux mayabang kase tayo)
 void clearScreen()
@@ -104,11 +106,14 @@ void loadingTransition(const string &message, int seconds)
 }
 
 
-// FILE HANDLING & CREATION (CSV VERSION)
+
+
+
+
+// FILE HANDLING & CREATION
 void initializeFiles()
 {
-    // Changed extensions to .csv
-    const char* files[] = {"students.csv", "cases.csv", "counselors.csv", "admins.csv", "appointments.csv"};
+    const char* files[] = {"students.dat", "cases.dat", "counselors.dat", "admins.dat"};
    
     for (const char* file : files)
     {
@@ -120,22 +125,24 @@ void initializeFiles()
             ofstream createFile(file);
             cout << "[SYSTEM] Created missing database file: " << file << endl;
             createFile.close();
-           
+            
             // Seed Admin (Ma. Leonila V. Urrea)
             if (strcmp(file, "admins.csv") == 0)
             {
-                ofstream adminFile(file, ios::app);
-                // Writing as comma-separated values
-                adminFile << "leonila_urrea,AdminPass123,Ma. Leonila V. Urrea\n";
+                ofstream adminFile(file, ios::binary | ios::app);
+                // Updated Username and Password
+                Admin defaultAdmin = {"leonila_urrea", "AdminPass123", "Ma. Leonila V. Urrea"};
+                adminFile.write(reinterpret_cast<char*>(&defaultAdmin), sizeof(Admin));
                 adminFile.close();
                 cout << "[SYSTEM] Default admin account created." << endl;
             }
-           
+            
             // Seed Counselors based on specific list
             if (strcmp(file, "counselors.csv") == 0)
             {
-                ofstream counselorFile(file, ios::app);
+                ofstream counselorFile(file, ios::binary | ios::app);
                
+                // Updated Usernames based on real names and unique passwords
                 Counselor defaultCounselors[5] = {
                     {"antonio_postrado", "Antonio@123", "Antonio C. Postrado Jr.", "Academic, Emotional, Career"},
                     {"jayson_parena", "Jayson@123", "Jayson S. Parena", "Academic, Emotional, Career"},
@@ -145,6 +152,15 @@ void initializeFiles()
                 };
 
 
+
+
+
+
+
+
+
+
+
                 for (int i = 0; i < 5; i++) {
                     // Writing as comma-separated values
                     counselorFile << defaultCounselors[i].username << ","
@@ -152,124 +168,167 @@ void initializeFiles()
                                   << defaultCounselors[i].name << ","
                                   << defaultCounselors[i].specialty << "\n";
                 }
-               
+                
                 counselorFile.close();
                 cout << "[SYSTEM] Staff counselor accounts seeded." << endl;
             }
 
 
-            // Seed default Students
-            if (strcmp(file, "students.csv") == 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // Seed default Student
+            if (strcmp(file, "students.dat") == 0)
             {
-                ofstream studentFile(file, ios::app);
-                Student students[] = {
-                    // ===== FIRST YEAR =====
-                    {20131155389LL, "macal01", "Macalintal, Lev Ryan F.", 1, 1, "jayson_parena"},
-                    {20251104485LL, "gran02", "Grande, Clayton Kelsey P.", 1, 1, "jayson_parena"},
-                    {20231109721LL, "cana03", "Canaveral, Miguel R.", 1, 1, "jayson_parena"},
-                    {20231123345LL, "ramos04", "Ramos, Rhian Zyrene G.", 1, 1, "jayson_parena"},
-                    {20251120066LL, "chiu05", "Chiu, Nash Patrick G.", 1, 1, "jayson_parena"},
-                    {20251123963LL, "alca06", "Alcazar, Maxine Aliyah F.", 1, 1, "jayson_parena"},
-                    {20251130106LL, "cruz07", "Cruz, Sean Russel D.", 1, 1, "jayson_parena"},
-                    {20251121161LL, "javi08", "Javier, Zionah Rae M.", 1, 1, "jayson_parena"},
-                    {20251114564LL, "bern09", "Bernabe, Marx Aaron M.", 1, 1, "jayson_parena"},
-                    {20251108846LL, "dion10", "Dionisio, Jerich Andrew", 1, 1, "jayson_parena"},
-                    {20251105412LL, "acun11", "Acuna, Emmanuel Patrick R.", 1, 1, "jayson_parena"},
-                    {20251131278LL, "guna12", "Gunabe, Jophielle Briggz", 1, 1, "jayson_parena"},
-                    {20221141259LL, "says13", "Sayson, Ralph Jericho A.", 1, 1, "jayson_parena"},
-                    {20251123850LL, "lama14", "Lamamigo, Eros", 1, 1, "jayson_parena"},
-                    {20231137749LL, "igna15", "Ignacio, Axel Audrey D.", 1, 1, "jayson_parena"},
-                    {20251117643LL, "chua16", "Chua, Cyrus G.", 1, 1, "jayson_parena"},
-                    {20251108255LL, "isra17", "Israel, Quinn Mallory C.", 1, 1, "jayson_parena"},
-                    {20191132646LL, "marq18", "Marquez, Manuel Alexander", 1, 1, "jayson_parena"},
-                    {20251129609LL, "rata19", "Rata, Rean May", 1, 1, "jayson_parena"},
-                    {20231128975LL, "yamb20", "Yambao, Zuriel Ethan P.", 1, 1, "jayson_parena"},
+                ofstream studentFile(file, ios::binary | ios::app);
+                // Updated assigned counselor to match Jayson's new username
+               Student students[] = {
 
 
-                    // ===== SECOND YEAR =====
-                    {20241113019LL, "ranc21", "Rance, Princess Nicole R.", 2, 1, "antonio_postrado"},
-                    {20241102346LL, "alde22", "Alde, Patrick P.", 2, 1, "antonio_postrado"},
-                    {20221105062LL, "baut23", "Bautista, Argelina Ryle P.", 2, 1, "antonio_postrado"},
-                    {20241123375LL, "alde24", "Aldeguer, Seun Gyrich I.", 2, 1, "antonio_postrado"},
-                    {20241120229LL, "gabi25", "Gabiano, Karl Sebastian B.", 2, 1, "antonio_postrado"},
-                    {20241120810LL, "gasp26", "Gaspi, Jay Lord F.", 2, 1, "antonio_postrado"},
-                    {20241117362LL, "jule27", "Jules, Roven", 2, 1, "antonio_postrado"},
-                    {20221112603LL, "bern28", "Bermardo, Tj", 2, 1, "antonio_postrado"},
-                    {20241120809LL, "timb29", "Timbol, Alexandria T.", 2, 1, "antonio_postrado"},
-                    {20241130029LL, "lope30", "Lopez, Gwen Angelynn", 2, 1, "antonio_postrado"},
-                    {20241116336LL, "roqu31", "Roque, Kayne Bernadette M.", 2, 1, "antonio_postrado"},
-                    {20241107313LL, "eyst32", "Eystaquio, Mariane", 2, 1, "antonio_postrado"},
-                    {20241141071LL, "dela33", "Dela Cruz, John Patrick", 2, 1, "antonio_postrado"},
-                    {20221124523LL, "jane34", "Janer, Jenny Rose M.", 2, 1, "antonio_postrado"},
-                    {20221104923LL, "nem35", "Nem, Hernan Jay", 2, 1, "antonio_postrado"},
-                    {20181114136LL, "park36", "Park, Chang Hyun A.", 2, 1, "antonio_postrado"},
-                    {20241126307LL, "tamp37", "Tampus, Jevric", 2, 1, "antonio_postrado"},
-                    {20241125746LL, "tole38", "Tolentino, Angela D.", 2, 1, "antonio_postrado"},
-                    {20241124674LL, "adam39", "Adame, Jennilie A.", 2, 1, "antonio_postrado"},
-                    {20221115635LL, "ogue40", "Oguez, John Meynaro R.", 2, 1, "antonio_postrado"},
 
 
-                    // ===== THIRD YEAR =====
-                    {20231110057LL, "coco41", "Coco, James H.", 3, 1, "janine_bautista"},
-                    {20131147803LL, "pine42", "Pineda, Franz Luis", 3, 1, "janine_bautista"},
-                    {20161137764LL, "ting43", "Ting, Aljiemer A.", 3, 1, "janine_bautista"},
-                    {20237144006LL, "goro44", "Gorospe, Rein Klyde T.", 3, 1, "janine_bautista"},
-                    {20211102453LL, "bonz45", "Bonzon, Aldrich", 3, 1, "janine_bautista"},
-                    {20231119974LL, "magr46", "Magrata, Renz", 3, 1, "janine_bautista"},
-                    {20211106739LL, "libr47", "Librada, Charles Bryan L.", 3, 1, "janine_bautista"},
-                    {20231143401LL, "bedi48", "Bedis, Ronwin Adlai B.", 3, 1, "janine_bautista"},
-                    {20111135659LL, "tiba49", "Tibay, Hyrile", 3, 1, "janine_bautista"},
-                    {20211114668LL, "rana50", "Rana, Adrian", 3, 1, "janine_bautista"},
-                    {20231128555LL, "vill51", "Villaflor, Kyle L.", 3, 1, "janine_bautista"},
-                    {20191151721LL, "cara52", "Carao, Johnleez", 3, 1, "janine_bautista"},
-                    {20231120140LL, "hale53", "Hale, Hannah Grace E.", 3, 1, "janine_bautista"},
-                    {20231150122LL, "gamb54", "Gambao, Rhamuel G.", 3, 1, "janine_bautista"},
-                    {20231123083LL, "yita55", "Yitalyu, Mark Andrew", 3, 1, "janine_bautista"},
-                    {20231125874LL, "baus56", "Bauson, John Carlo T.", 3, 1, "janine_bautista"},
-                    {20211115901LL, "rons57", "Ronsairo, Tordan P.", 3, 1, "janine_bautista"},
-                    {20211105452LL, "dial58", "Dialino, Rny Marc A.", 3, 1, "janine_bautista"},
-                    {20231135618LL, "bayo59", "Bayona, Ralph", 3, 1, "janine_bautista"},
-                    {20231114933LL, "simb60", "Simbulan, Anton Francis J.", 3, 1, "janine_bautista"},
 
 
-                    // ===== FOURTH YEAR =====
-                    {20221129620LL, "cruz61", "Cruz, Fyi James J.", 4, 1, "arnold_desilva"},
-                    {20171109323LL, "rock62", "Rock, Chester M.", 4, 1, "arnold_desilva"},
-                    {20161117744LL, "laca63", "Lacay, Tristan Russel M.", 4, 1, "arnold_desilva"},
-                    {20221132054LL, "go64", "Go, Hans Stephen", 4, 1, "arnold_desilva"},
-                    {20201129961LL, "buen65", "Buenaventura, Ai Francis", 4, 1, "arnold_desilva"},
-                    {20211106739LL, "libr66", "Librada, Charles", 4, 1, "arnold_desilva"},
-                    {20221131244LL, "nava67", "Navaro, Juanabel E.", 4, 1, "arnold_desilva"},
-                    {20221130354LL, "paja68", "Pajarillaga, Jasmine Rose R.", 4, 1, "arnold_desilva"},
-                    {20221133228LL, "bayl69", "Baylon, Trisha", 4, 1, "arnold_desilva"},
-                    {20221103288LL, "mark70", "Mark Geoffrey", 4, 1, "arnold_desilva"},
-                    {20221120509LL, "dona71", "Donayre, Willianne Lorraine M.", 4, 1, "arnold_desilva"},
-                    {20221119159LL, "conc72", "Conception, Liam Pyro P.", 4, 1, "arnold_desilva"},
-                    {20201107564LL, "vino73", "Vinoya, John Joneil", 4, 1, "arnold_desilva"},
-                    {20201107622LL, "dizo74", "Dizon, Marc", 4, 1, "arnold_desilva"},
-                    {20221100830LL, "anir75", "Anirion, Cristian F.", 4, 1, "arnold_desilva"},
-                    {20221100410LL, "bern76", "Bernardino, Bryan G.", 4, 1, "arnold_desilva"},
-                    {20221129880LL, "fran77", "Franco, Ivan B.", 4, 1, "arnold_desilva"},
-                    {2021135155LL, "agui78", "Aguire, Angelito B.", 4, 1, "arnold_desilva"},
-                    {20221105312LL, "marv79", "Marivic, John", 4, 1, "arnold_desilva"},
-                    {20221131038LL, "san80", "Santos, Maria", 4, 1, "arnold_desilva"}
-                };
 
 
-                int numStudents = sizeof(students) / sizeof(Student);
+    // ===== FIRST YEAR =====
+    {20131155389LL, "macal01", "Macalintal, Lev Ryan F.", 1, 1, "jayson_parena"},
+    {20251104485LL, "gran02", "Grande, Clayton Kelsey P.", 1, 1, "jayson_parena"},
+    {20231109721LL, "cana03", "Canaveral, Miguel R.", 1, 1, "jayson_parena"},
+    {20231123345LL, "ramos04", "Ramos, Rhian Zyrene G.", 1, 1, "jayson_parena"},
+    {20251120066LL, "chiu05", "Chiu, Nash Patrick G.", 1, 1, "jayson_parena"},
+    {20251123963LL, "alca06", "Alcazar, Maxine Aliyah F.", 1, 1, "jayson_parena"},
+    {20251130106LL, "cruz07", "Cruz, Sean Russel D.", 1, 1, "jayson_parena"},
+    {20251121161LL, "javi08", "Javier, Zionah Rae M.", 1, 1, "jayson_parena"},
+    {20251114564LL, "bern09", "Bernabe, Marx Aaron M.", 1, 1, "jayson_parena"},
+    {20251108846LL, "dion10", "Dionisio, Jerich Andrew", 1, 1, "jayson_parena"},
+    {20251105412LL, "acun11", "Acuna, Emmanuel Patrick R.", 1, 1, "jayson_parena"},
+    {20251131278LL, "guna12", "Gunabe, Jophielle Briggz", 1, 1, "jayson_parena"},
+    {20221141259LL, "says13", "Sayson, Ralph Jericho A.", 1, 1, "jayson_parena"},
+    {20251123850LL, "lama14", "Lamamigo, Eros", 1, 1, "jayson_parena"},
+    {20231137749LL, "igna15", "Ignacio, Axel Audrey D.", 1, 1, "jayson_parena"},
+    {20251117643LL, "chua16", "Chua, Cyrus G.", 1, 1, "jayson_parena"},
+    {20251108255LL, "isra17", "Israel, Quinn Mallory C.", 1, 1, "jayson_parena"},
+    {20191132646LL, "marq18", "Marquez, Manuel Alexander", 1, 1, "jayson_parena"},
+    {20251129609LL, "rata19", "Rata, Rean May", 1, 1, "jayson_parena"},
+    {20231128975LL, "yamb20", "Yambao, Zuriel Ethan P.", 1, 1, "jayson_parena"},
 
 
-                for (int i = 0; i < numStudents; i++) {
-                    // Writing as comma-separated values
-                    studentFile << students[i].studentID << ","
-                                << students[i].password << ","
-                                << students[i].name << ","
-                                << students[i].yearLevel << ","
-                                << students[i].stressLevel << ","
-                                << students[i].assignedCounselor << "\n";
-                }
 
 
+
+
+
+
+    // ===== SECOND YEAR =====
+    {20241113019LL, "ranc21", "Rance, Princess Nicole R.", 2, 1, "antonio_postrado"},
+    {20241102346LL, "alde22", "Alde, Patrick P.", 2, 1, "antonio_postrado"},
+    {20221105062LL, "baut23", "Bautista, Argelina Ryle P.", 2, 1, "antonio_postrado"},
+    {20241123375LL, "alde24", "Aldeguer, Seun Gyrich I.", 2, 1, "antonio_postrado"},
+    {20241120229LL, "gabi25", "Gabiano, Karl Sebastian B.", 2, 1, "antonio_postrado"},
+    {20241120810LL, "gasp26", "Gaspi, Jay Lord F.", 2, 1, "antonio_postrado"},
+    {20241117362LL, "jule27", "Jules, Roven", 2, 1, "antonio_postrado"},
+    {20221112603LL, "bern28", "Bermardo, Tj", 2, 1, "antonio_postrado"},
+    {20241120809LL, "timb29", "Timbol, Alexandria T.", 2, 1, "antonio_postrado"},
+    {20241130029LL, "lope30", "Lopez, Gwen Angelynn", 2, 1, "antonio_postrado"},
+    {20241116336LL, "roqu31", "Roque, Kayne Bernadette M.", 2, 1, "antonio_postrado"},
+    {20241107313LL, "eyst32", "Eystaquio, Mariane", 2, 1, "antonio_postrado"},
+    {20241141071LL, "dela33", "Dela Cruz, John Patrick", 2, 1, "antonio_postrado"},
+    {20221124523LL, "jane34", "Janer, Jenny Rose M.", 2, 1, "antonio_postrado"},
+    {20221104923LL, "nem35", "Nem, Hernan Jay", 2, 1, "antonio_postrado"},
+    {20181114136LL, "park36", "Park, Chang Hyun A.", 2, 1, "antonio_postrado"},
+    {20241126307LL, "tamp37", "Tampus, Jevric", 2, 1, "antonio_postrado"},
+    {20241125746LL, "tole38", "Tolentino, Angela D.", 2, 1, "antonio_postrado"},
+    {20241124674LL, "adam39", "Adame, Jennilie A.", 2, 1, "antonio_postrado"},
+    {20221115635LL, "ogue40", "Oguez, John Meynaro R.", 2, 1, "antonio_postrado"},
+
+
+
+
+
+
+
+
+    // ===== THIRD YEAR =====
+    {20231110057LL, "coco41", "Coco, James H.", 3, 1, "janine_bautista"},
+    {20131147803LL, "pine42", "Pineda, Franz Luis", 3, 1, "janine_bautista"},
+    {20161137764LL, "ting43", "Ting, Aljiemer A.", 3, 1, "janine_bautista"},
+    {20237144006LL, "goro44", "Gorospe, Rein Klyde T.", 3, 1, "janine_bautista"},
+    {20211102453LL, "bonz45", "Bonzon, Aldrich", 3, 1, "janine_bautista"},
+    {20231119974LL, "magr46", "Magrata, Renz", 3, 1, "janine_bautista"},
+    {20211106739LL, "libr47", "Librada, Charles Bryan L.", 3, 1, "janine_bautista"},
+    {20231143401LL, "bedi48", "Bedis, Ronwin Adlai B.", 3, 1, "janine_bautista"},
+    {20111135659LL, "tiba49", "Tibay, Hyrile", 3, 1, "janine_bautista"},
+    {20211114668LL, "rana50", "Rana, Adrian", 3, 1, "janine_bautista"},
+    {20231128555LL, "vill51", "Villaflor, Kyle L.", 3, 1, "janine_bautista"},
+    {20191151721LL, "cara52", "Carao, Johnleez", 3, 1, "janine_bautista"},
+    {20231120140LL, "hale53", "Hale, Hannah Grace E.", 3, 1, "janine_bautista"},
+    {20231150122LL, "gamb54", "Gambao, Rhamuel G.", 3, 1, "janine_bautista"},
+    {20231123083LL, "yita55", "Yitalyu, Mark Andrew", 3, 1, "janine_bautista"},
+    {20231125874LL, "baus56", "Bauson, John Carlo T.", 3, 1, "janine_bautista"},
+    {20211115901LL, "rons57", "Ronsairo, Tordan P.", 3, 1, "janine_bautista"},
+    {20211105452LL, "dial58", "Dialino, Rny Marc A.", 3, 1, "janine_bautista"},
+    {20231135618LL, "bayo59", "Bayona, Ralph", 3, 1, "janine_bautista"},
+    {20231114933LL, "simb60", "Simbulan, Anton Francis J.", 3, 1, "janine_bautista"},
+
+
+
+
+
+
+
+
+    // ===== FOURTH YEAR =====
+    {20221129620LL, "cruz61", "Cruz, Fyi James J.", 4, 1, "arnold_desilva"},
+    {20171109323LL, "rock62", "Rock, Chester M.", 4, 1, "arnold_desilva"},
+    {20161117744LL, "laca63", "Lacay, Tristan Russel M.", 4, 1, "arnold_desilva"},
+    {20221132054LL, "go64", "Go, Hans Stephen", 4, 1, "arnold_desilva"},
+    {20201129961LL, "buen65", "Buenaventura, Ai Francis", 4, 1, "arnold_desilva"},
+    {20211106739LL, "libr66", "Librada, Charles", 4, 1, "arnold_desilva"},
+    {20221131244LL, "nava67", "Navaro, Juanabel E.", 4, 1, "arnold_desilva"},
+    {20221130354LL, "paja68", "Pajarillaga, Jasmine Rose R.", 4, 1, "arnold_desilva"},
+    {20221133228LL, "bayl69", "Baylon, Trisha", 4, 1, "arnold_desilva"},
+    {20221103288LL, "mark70", "Mark Geoffrey", 4, 1, "arnold_desilva"},
+    {20221120509LL, "dona71", "Donayre, Willianne Lorraine M.", 4, 1, "arnold_desilva"},
+    {20221119159LL, "conc72", "Conception, Liam Pyro P.", 4, 1, "arnold_desilva"},
+    {20201107564LL, "vino73", "Vinoya, John Joneil", 4, 1, "arnold_desilva"},
+    {20201107622LL, "dizo74", "Dizon, Marc", 4, 1, "arnold_desilva"},
+    {20221100830LL, "anir75", "Anirion, Cristian F.", 4, 1, "arnold_desilva"},
+    {20221100410LL, "bern76", "Bernardino, Bryan G.", 4, 1, "arnold_desilva"},
+    {20221129880LL, "fran77", "Franco, Ivan B.", 4, 1, "arnold_desilva"},
+    {2021135155LL, "agui78", "Aguire, Angelito B.", 4, 1, "arnold_desilva"},
+    {20221105312LL, "marv79", "Marivic, John", 4, 1, "arnold_desilva"},
+    {20221131038LL, "san80", "Santos, Maria", 4, 1, "arnold_desilva"}
+};
+
+
+
+
+
+
+
+
+int numStudents = sizeof(students) / sizeof(Student);
+    for (int i = 0; i < numStudents; i++) {
+    // This writes the student data to a single line, separated by spaces and a pipe
+    studentFile << students[i].studentID << " "
+                << students[i].password << " "
+                << students[i].name << "|"
+                << students[i].yearLevel << " "
+                << students[i].stressLevel << " "
+                << students[i].assignedCounselor << endl;
+    }
                 studentFile.close();
                 cout << "[SYSTEM] Default student accounts seeded." << endl;
             }
