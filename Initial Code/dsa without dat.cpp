@@ -9,7 +9,11 @@
 #include <cstdlib>   // Added for atoll
 
 
+
+
 using namespace std;
+
+
 
 
 // DATA STRUCTURES (Entities)
@@ -26,12 +30,22 @@ struct Student
 
 
 
+
+
+
+
 struct Admin
 {
     char username[20];
     char password[20];
     char name[50]; // Added to store Admin's real name
 };
+
+
+
+
+
+
 
 
 
@@ -47,8 +61,9 @@ struct Counselor
     int assignedYear;
 };
 
+
 struct Case {
-    char studentID[20];                
+    long long studentID; // long long yung crocodile haha
     char clinicalObservations[500];     // [1] Clinical Observations
     char discussionSummary[500];        // [2] Discussion Summary
     char professionalAssessment[500];   // [3] Counselor's Assessment
@@ -56,13 +71,18 @@ struct Case {
     char date[20];                      // [DATE/TIME] from concept
 };
 
+
 struct Appointment {
-    char studentID[20];
+    char studentID[20]; // Change from char[20] to match Student struct
     char studentName[50];
     char reason[200];
-    char preferredDate[20]; // For Bookings; can store "ASAP" for Emergencies
-    char type;              // 'E' for Emergency, 'B' for Booking
+    char preferredDate[20];
+    char type; // 'E' or 'B'
 };
+
+
+
+
 
 
 
@@ -85,6 +105,14 @@ void clearScreen()
 
 
 
+
+
+
+
+
+
+
+
 // Simulated loading screen ni daddy Euken
 void loadingTransition(const string& message, int seconds)
 {
@@ -92,6 +120,12 @@ void loadingTransition(const string& message, int seconds)
     this_thread::sleep_for(chrono::seconds(seconds));
     clearScreen();
 }
+
+
+
+
+
+
 
 
 
@@ -147,6 +181,17 @@ void initializeFiles()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
                 for (int i = 0; i < 5; i++) {
                     counselorFile.write(reinterpret_cast<char*>(&defaultCounselors[i]), sizeof(Counselor));
                 }
@@ -170,12 +215,36 @@ void initializeFiles()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             // Seed default Student
             if (strcmp(file, "students") == 0)
             {
                 ofstream studentFile(file, ios::binary | ios::app);
                 // Updated assigned counselor to match Jayson's new username
                Student students[] = {
+
+
+
+
+
+
+
+
 
 
 
@@ -213,6 +282,14 @@ void initializeFiles()
 
 
 
+
+
+
+
+
+
+
+
     // ===== SECOND YEAR =====
     {20241113019LL, "ranc21", "Rance, Princess Nicole R.", 2, 1, "antonio_postrado"},
     {20241102346LL, "alde22", "Alde, Patrick P.", 2, 1, "antonio_postrado"},
@@ -242,6 +319,14 @@ void initializeFiles()
 
 
 
+
+
+
+
+
+
+
+
     // ===== THIRD YEAR =====
     {20231110057LL, "coco41", "Coco, James H.", 3, 1, "janine_bautista"},
     {20131147803LL, "pine42", "Pineda, Franz Luis", 3, 1, "janine_bautista"},
@@ -263,6 +348,14 @@ void initializeFiles()
     {20211105452LL, "dial58", "Dialino, Rny Marc A.", 3, 1, "janine_bautista"},
     {20231135618LL, "bayo59", "Bayona, Ralph", 3, 1, "janine_bautista"},
     {20231114933LL, "simb60", "Simbulan, Anton Francis J.", 3, 1, "janine_bautista"},
+
+
+
+
+
+
+
+
 
 
 
@@ -301,6 +394,14 @@ void initializeFiles()
 
 
 
+
+
+
+
+
+
+
+
 int numStudents = sizeof(students) / sizeof(Student);
     for (int i = 0; i < numStudents; i++) {
     // This writes the student data to a single line, separated by spaces and a pipe
@@ -328,6 +429,12 @@ int numStudents = sizeof(students) / sizeof(Student);
 
 
 
+
+
+
+
+
+
 // ALGORITHMS
 // 1. Helper function for Quick Sort (Swaps two Student records)
 void swapStudents(Student& a, Student& b)
@@ -338,11 +445,15 @@ void swapStudents(Student& a, Student& b)
 }
 
 
+
+
 // 2. Partition function for Quick Sort
 int partitionByID(vector<Student>& arr, int low, int high)
 {
     long long pivot = arr[high].studentID; // Choosing the last element as the pivot
     int i = (low - 1); // Index of the smaller element
+
+
 
 
     for (int j = low; j <= high - 1; j++)
@@ -361,6 +472,10 @@ int partitionByID(vector<Student>& arr, int low, int high)
 
 
 
+
+
+
+
 // 3. The actual Quick Sort Function (Sort by Student ID)
 void quickSortByID(vector<Student>& arr, int low, int high)
 {
@@ -370,17 +485,21 @@ void quickSortByID(vector<Student>& arr, int low, int high)
         int pi = partitionByID(arr, low, high);
 
 
+
+
         // Separately sort elements before and after partition
         quickSortByID(arr, low, pi - 1);
         quickSortByID(arr, pi + 1, high);
     }
 }
 
+
 // 4. Partition function for Quick Sort by Priority (Stress Level descending)
 int partitionByPriority(Student arr[], int low, int high)
 {
     int pivot = arr[high].stressLevel;
     int i = low - 1;
+
 
     for (int j = low; j < high; j++)
     {
@@ -393,6 +512,7 @@ int partitionByPriority(Student arr[], int low, int high)
     swapStudents(arr[i + 1], arr[high]);
     return i + 1;
 }
+
 
 // 5. Quick Sort by Priority
 void quickSortPriority(Student arr[], int low, int high)
@@ -412,6 +532,14 @@ void quickSortPriority(Student arr[], int low, int high)
 
 
 
+
+
+
+
+
+
+
+
 // Perfect for sorted, non-uniform data like real Student Numbers.
 int binarySearch(const vector<Student>& arr, long long targetID)
 {
@@ -423,11 +551,15 @@ int binarySearch(const vector<Student>& arr, long long targetID)
         int mid = left + (right - left) / 2;
 
 
+
+
         // 1. Target found!
         if (arr[mid].studentID == targetID)
         {
             return mid;
         }
+
+
 
 
         // 2. If target is greater, ignore the left half
@@ -444,9 +576,19 @@ int binarySearch(const vector<Student>& arr, long long targetID)
     }
 
 
+
+
     // Target was not found in the array
     return -1;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -498,6 +640,10 @@ void adminAddStudent()
 
 
 
+
+
+
+
 void adminAddCounselor()
 {
     clearScreen();
@@ -532,6 +678,10 @@ void adminAddCounselor()
 
 
 
+
+
+
+
 void adminViewCounselors() {
     clearScreen();
     cout << "========================================================================================================================" << endl;
@@ -546,6 +696,8 @@ void adminViewCounselors() {
     cout << "------------------------------------------------------------------------------------------------------------------------" << endl;
 
 
+
+
     ifstream file("counselors", ios::binary | ios::in);
    
     if (!file) {
@@ -553,6 +705,8 @@ void adminViewCounselors() {
     } else {
         Counselor temp;
         int count = 0;
+
+
 
 
         // Ensure we are reading exactly the size of the class
@@ -568,6 +722,8 @@ void adminViewCounselors() {
         }
 
 
+
+
         if (count == 0) cout << " > No counselor staff currently registered." << endl;
         file.close();
     }
@@ -577,6 +733,12 @@ void adminViewCounselors() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin.get();
 }
+
+
+
+
+
+
 
 
 
@@ -660,6 +822,9 @@ void studentDashboard(Student currentStudent)
 
 
 
+
+
+
 void counselorDashboard(Counselor currentCounselor)
 {
     int choice = 0;
@@ -725,40 +890,47 @@ void counselorDashboard(Counselor currentCounselor)
                 cin.get();
                 break;
             }
-            
+           
            case 2: // Log New Counseling Case & Update Stress Level (Idea B)
     {
         Case newCase;
         int professionalStressLevel;
-        
+       
         loadingTransition("Logging New Counseling Case", 1);
         clearScreen();
         cout << "==================================================" << endl;
         cout << "          NEW SESSION LOG: CLINICAL FINDINGS      " << endl;
         cout << "==================================================" << endl;
 
+
         cout << "Enter Target Student ID: ";
         cin >> newCase.studentID;
         cin.ignore(1000, '\n');
+
 
         cout << "\n[1] CLINICAL OBSERVATIONS:" << endl;
         cout << ">> Enter appearance/demeanor: ";
         cin.getline(newCase.clinicalObservations, 500);
 
+
         cout << "\n[2] DISCUSSION SUMMARY:" << endl;
         cout << ">> Brief notes on session topics: ";
         cin.getline(newCase.discussionSummary, 500);
+
 
         cout << "\n[3] COUNSELOR'S ASSESSMENT:" << endl;
         cout << ">> Your professional findings: ";
         cin.getline(newCase.professionalAssessment, 500);
 
+
         cout << "\n[4] ACTION PLAN:" << endl;
         cout << ">> Next steps for the student: ";
         cin.getline(newCase.actionPlan, 500);
 
+
         cout << "\n[5] DATE (MM/DD/YYYY): ";
         cin.getline(newCase.date, 20);
+
 
         // Append to cases
         ofstream outFile("cases", ios::binary | ios::app);
@@ -768,27 +940,29 @@ void counselorDashboard(Counselor currentCounselor)
             cout << "\n[SYSTEM] Saving findings to cases... Success." << endl;
         }
 
+
         // --- IDEA B: PROFESSIONAL OVERRIDE ---
         cout << "\n--------------------------------------------------" << endl;
         cout << "[STRESS LEVEL RE-EVALUATION]" << endl;
         cout << ">> Enter new Professional Stress Level (1-10): ";
         cin >> professionalStressLevel;
-        
+       
         // In-place Binary File Update for students
         fstream studentFile("students", ios::in | ios::out | ios::binary);
         Student tempStud;
         bool studentFound = false;
 
+
         if (studentFile) {
             while(studentFile.read(reinterpret_cast<char*>(&tempStud), sizeof(Student))) {
-                if(tempStud.studentID == atoll(newCase.studentID)) {
+                if(tempStud.studentID == newCase.studentID) {
                     tempStud.stressLevel = professionalStressLevel; // Update struct
-                    
+                   
                     // Move the put pointer back by one struct size to overwrite
                     int pos = -1 * static_cast<int>(sizeof(Student));
                     studentFile.seekp(pos, ios::cur);
                     studentFile.write(reinterpret_cast<char*>(&tempStud), sizeof(Student));
-                    
+                   
                     studentFound = true;
                     break;
                 }
@@ -796,16 +970,19 @@ void counselorDashboard(Counselor currentCounselor)
             studentFile.close();
         }
 
+
         if(studentFound) {
             cout << "[SYSTEM] Student stressLevel updated to " << professionalStressLevel << " in students." << endl;
         } else {
             cout << "[ERROR] Student ID not found in students." << endl;
         }
 
+
         cout << "\nPress Enter to return to Dashboard...";
         cin.ignore(1000, '\n'); cin.get();
         break;
     }
+
 
     case 3: // Search Case History by ID
     {
@@ -813,14 +990,17 @@ void counselorDashboard(Counselor currentCounselor)
         Case tempCase;
         bool found = false;
 
+
         loadingTransition("Searching case history", 1);
         clearScreen();
         cout << "==================================================" << endl;
         cout << "           Search Case History by ID              " << endl;
         cout << "==================================================" << endl;
 
+
         cout << "Enter Student ID (SN) to pull history: ";
         cin >> searchID;
+
 
         ifstream inFile("cases", ios::binary);
         if (!inFile) {
@@ -828,11 +1008,13 @@ void counselorDashboard(Counselor currentCounselor)
             break;
         }
 
+
         cout << "\nPulling past sessions for: " << searchID << endl;
         cout << "--------------------------------------------------" << endl;
 
+
         while (inFile.read(reinterpret_cast<char*>(&tempCase), sizeof(Case))) {
-            if (strcmp(tempCase.studentID, searchID) == 0) {
+            if (tempCase.studentID == atoll(searchID)) {
                 found = true;
                 cout << "\n[DATE]: " << tempCase.date << endl;
                 cout << "[OBSERVATIONS]: " << tempCase.clinicalObservations << endl;
@@ -843,137 +1025,151 @@ void counselorDashboard(Counselor currentCounselor)
             }
         }
 
+
         if (!found) cout << "[SYSTEM] No past session history found." << endl;
         inFile.close();
+
 
         cout << "\nPress Enter to return to Dashboard...";
         cin.ignore(1000, '\n'); cin.get();
         break;
     }
 
-    case 4: // View Session Queue (Emergency First, Then Bookings)
+
+case 4: // View Session Queue
     {
         Appointment tempAppt;
         bool foundAny = false;
         
-        loadingTransition("Loading Session Queue", 1);
+        loadingTransition("Opening appointments.dat...", 1);
         clearScreen();
         cout << "==================================================" << endl;
         cout << "              ACTIVE SESSION QUEUE                " << endl;
         cout << "==================================================" << endl;
 
-        ifstream inFile("appointments", ios::binary);
+        ifstream inFile("appointments.dat", ios::binary | ios::in);
         if (!inFile) {
-            cout << "[System] No appointments or emergencies found." << endl;
-            break;
-        }
-
-        // PASS 1: Emergencies First
-        cout << "\n[ !!! EMERGENCY ALERTS !!! ]" << endl;
-        while (inFile.read(reinterpret_cast<char*>(&tempAppt), sizeof(Appointment))) {
-            if (tempAppt.type == 'E') {
-                foundAny = true;
-                cout << "STUDENT: " << tempAppt.studentID << " | " << tempAppt.studentName << endl;
-                cout << "REASON:  " << tempAppt.reason << endl;
-                cout << "--------------------------------------------------" << endl;
-            }
-        }
-
-        inFile.clear();            // Clear EOF flag
-        inFile.seekg(0, ios::beg); // Rewind back to start of file
-
-        // PASS 2: Standard Bookings
-        cout << "\n[ STANDARD BOOKINGS ]" << endl;
-        while (inFile.read(reinterpret_cast<char*>(&tempAppt), sizeof(Appointment))) {
-            if (tempAppt.type == 'B') {
-                foundAny = true;
-                cout << "DATE:    " << tempAppt.preferredDate << endl;
-                cout << "STUDENT: " << tempAppt.studentID << " | " << tempAppt.studentName << endl;
-                cout << "REASON:  " << tempAppt.reason << endl;
-                cout << "--------------------------------------------------" << endl;
-            }
-        }
-        
-        if (!foundAny) cout << "Queue is currently empty." << endl;
-        inFile.close();
-        
-        cout << "\nPress Enter to return to Dashboard...";
-        cin.ignore(1000, '\n'); cin.get();
-        break;
-    }
-
-    case 5: // Sort Students by Wellness Priority (Quick Sort)
-    {
-        loadingTransition("Sorting Data", 1);
-        clearScreen();
-        cout << "==================================================" << endl;
-        cout << "                WELLNESS PRIORITY LIST            " << endl;
-        cout << "==================================================" << endl;
-
-        // Count how many students exist
-        ifstream countFile("students", ios::binary);
-        if (!countFile) {
-            cout << "[Error] No student data found." << endl;
-            break;
-        }
-        countFile.seekg(0, ios::end);
-        int studentCount = countFile.tellg() / sizeof(Student);
-        countFile.seekg(0, ios::beg);
-
-        if (studentCount == 0) {
-            cout << "No students registered yet." << endl;
-            break;
-        }
-
-        // Load into dynamic array
-        Student* students = new Student[studentCount];
-        for (int i = 0; i < studentCount; i++) {
-            countFile.read(reinterpret_cast<char*>(&students[i]), sizeof(Student));
-        }
-        countFile.close();
-
-        // Perform the Quick Sort
-        quickSortPriority(students, 0, studentCount - 1);
-
-        // Display Data
-        cout << "Priority | ID           | Name                 | Stress Level" << endl;
-        cout << "--------------------------------------------------------------" << endl;
-        {
-            int priorityRank = 1; 
-            bool foundAssessed = false; 
-
-            for (int i = 0; i < studentCount; i++) {
-                if (students[i].stressLevel > 1) { 
-                    foundAssessed = true;
-                    cout << "  " << priorityRank << "  | " 
-                         << students[i].studentID << " | " 
-                         << students[i].name << " | " 
-                         << students[i].stressLevel << " / 10" << endl;
-                    priorityRank++; 
+            cout << "\n[System Status] appointments.dat not found." << endl;
+            cout << "No active queue to display." << endl;
+            // Removed 'break' so it reaches the cin.get() below
+        } else {
+            // PASS 1: Emergencies 
+            cout << "[Checking Emergencies...]" << endl;
+            while (inFile.read(reinterpret_cast<char*>(&tempAppt), sizeof(Appointment))) {
+                if (tempAppt.type == 'E' || tempAppt.type == 'e') {
+                    foundAny = true;
+                    cout << "STUDENT ID: " << tempAppt.studentID << endl;
+                    cout << "REASON:     " << tempAppt.reason << endl;
+                    cout << "--------------------------------------------------" << endl;
                 }
             }
 
-            if (!foundAssessed) {
-                cout << "\n > No students have completed the Wellness Assessment yet." << endl;
+            inFile.clear(); 
+            inFile.seekg(0, ios::beg); 
+
+            // PASS 2: Bookings
+            cout << "\n[Checking Bookings...]" << endl;
+            while (inFile.read(reinterpret_cast<char*>(&tempAppt), sizeof(Appointment))) {
+                if (tempAppt.type == 'B' || tempAppt.type == 'b') {
+                    foundAny = true;
+                    cout << "DATE:       " << tempAppt.preferredDate << endl;
+                    cout << "STUDENT ID: " << tempAppt.studentID << endl;
+                    cout << "--------------------------------------------------" << endl;
+                }
             }
+            if (!foundAny) cout << "No matching records found in file." << endl;
+            inFile.close();
         }
-        
-        delete[] students; // Free memory
+
         cout << "\nPress Enter to return to Dashboard...";
+        cin.ignore(1000, '\n'); 
+        cin.get();
+        break;
+    }
+
+   case 5: // Wellness Priority List
+{
+    ifstream countFile("students", ios::binary | ios::in);
+    if (!countFile) {
+        cout << "[ERROR] Student database not found." << endl;
+        cout << "\nPress Enter to return...";
         cin.ignore(1000, '\n'); cin.get();
         break;
     }
 
-    case 6: // Logout
-        cout << "Logging out... Returning to Main Menu." << endl;
-        return;
-
-    default:
-        cout << "Invalid choice. Please try again." << endl;
+    countFile.seekg(0, ios::end);
+    long long fileSize = static_cast<long long>(countFile.tellg());
+    if (fileSize <= 0) {
+        cout << "[SYSTEM] No students registered yet." << endl;
+        countFile.close();
+        cout << "\nPress Enter to return...";
+        cin.ignore(1000, '\n'); cin.get();
         break;
     }
-} while (choice != 6);
+
+    int studentCount = static_cast<int>(fileSize / sizeof(Student));
+    countFile.seekg(0, ios::beg);
+
+    // NEW SAFETY CHECK (Prevents the "Critical Error" crash)
+    if (fileSize % sizeof(Student) != 0 || studentCount == 0) {
+        cout << "[Critical Error] Database file is corrupted or mismatched." << endl;
+        cout << "The Crocodile ID (long long) struct size is: " << sizeof(Student) << " bytes." << endl;
+        countFile.close();
+        cout << "\nPress Enter to return...";
+        cin.ignore(1000, '\n'); cin.get();
+        break;
+    }
+
+    // Allocate memory
+    Student* students = new Student[studentCount];
+    for (int i = 0; i < studentCount; i++) {
+        countFile.read(reinterpret_cast<char*>(&students[i]), sizeof(Student));
+    }
+    countFile.close();
+
+    quickSortPriority(students, 0, studentCount - 1);
+
+    // FIXED DISPLAY LOOP
+    cout << "Rank | ID           | Name                 | Stress Level" << endl;
+    cout << "----------------------------------------------------------------" << endl;
+    
+    int pRank = 1;         // Changed 'rank' to 'pRank' to fix std::rank error
+    bool isFound = false;  // Changed 'foundAssessed' to 'isFound' to be safe
+
+    for (int i = 0; i < studentCount; i++) {
+        // Filter students with valid stress levels
+        if (students[i].stressLevel > 1 && students[i].stressLevel <= 10) { 
+            isFound = true;
+            cout << "  " << pRank << "  | " 
+                 << students[i].studentID << " | " 
+                 << students[i].name << " | " 
+                 << students[i].stressLevel << " / 10" << endl;
+            pRank++; 
+        }
+    }
+
+    if (!isFound) {
+        cout << "\n > No priority cases found (All levels are 1 or 0)." << endl;
+    }
+
+    delete[] students; 
+    cout << "\nPress Enter to return to Dashboard...";
+    cin.ignore(1000, '\n'); cin.get();
+    break;
+} 
+
+            case 6:
+                loadingTransition("Logging out securely", 1);
+                break;
+            default:
+                cout << "[ERROR] Invalid choice. Please try again." << endl;
+                this_thread::sleep_for(chrono::seconds(1));
+        }
+    } while (choice != 6); // Updated to exit on choice 6 lmao
 }
+
+
+
 
 
 
@@ -1028,6 +1224,11 @@ void adminDashboard(Admin currentAdmin)
 
 
 
+
+
+
+
+
 // LOGIN SYSTEMS
 bool adminLogin(Admin& loggedInAdmin)
 {
@@ -1041,6 +1242,10 @@ bool adminLogin(Admin& loggedInAdmin)
         cin >> inputUser;
        
         if (strcmp(inputUser, "exit") == 0) return false;
+
+
+
+
 
 
 
@@ -1074,6 +1279,10 @@ bool adminLogin(Admin& loggedInAdmin)
 
 
 
+
+
+
+
 bool counselorLogin(Counselor& loggedInCounselor)
 {
     char inputUser[20];
@@ -1087,6 +1296,16 @@ bool counselorLogin(Counselor& loggedInCounselor)
         cin >> inputUser;
        
         if (strcmp(inputUser, "exit") == 0) return false;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1131,6 +1350,14 @@ bool counselorLogin(Counselor& loggedInCounselor)
 
 
 
+
+
+
+
+
+
+
+
 void studentLogin()
 {
     long long id;
@@ -1159,6 +1386,14 @@ void studentLogin()
             this_thread::sleep_for(chrono::seconds(1));
             return;
         }
+
+
+
+
+
+
+
+
 
 
 
@@ -1205,6 +1440,12 @@ void studentLogin()
         }
     }
 }
+
+
+
+
+
+
 
 
 
@@ -1270,6 +1511,7 @@ void loginMenu()
     } while (choice != 4);
 }
 
+
 // MAIN FUNCTION
 int main()
 {
@@ -1277,3 +1519,4 @@ int main()
     loginMenu();
     return 0;
 }
+

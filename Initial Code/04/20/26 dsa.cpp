@@ -53,16 +53,15 @@ struct Case
 };
 
 
-struct Appointment
-{
-    char studentID[20]; // Change from char[20] to match Student struct
+struct Appointment {
+    char studentID[20];
     char studentName[50];
-    char reason[200];
+    char reason[100];
     char preferredDate[20];
+    char preferredTime[20];      
     char assignedCounselor[20];
-    char type; // 'E' or 'B'
+    char type;                    // 'E' for Emergency, 'B' for Normal Booking
 };
-
 
 // HELPER FUNCTIONS
 // Cross-platform screen clear (detects if you are on Windows or Mac/Linux mayabang kase tayo)
@@ -1047,9 +1046,7 @@ void counselorDashboard(Counselor currentCounselor)
 
                case 4:
         {
-            Appointment tempAppt;
             bool foundAny = false;
-
 
             loadingTransition("Syncing with appointments.csv", 1);
             clearScreen();
@@ -1057,89 +1054,109 @@ void counselorDashboard(Counselor currentCounselor)
             cout << "              ACTIVE SESSION QUEUE                " << endl;
             cout << "==================================================" << endl;
 
-
             ifstream inFile("appointments.csv");
             if (!inFile)
             {
                 cout << "[System] No appointments or emergencies found." << endl;
-                // No break here
+                cout << "\nPress Enter to return to Dashboard...";
+                cin.ignore(1000, '\n');
+                cin.get();
+                break;
             }
-            else
+
+            vector<Appointment> appointments;
+            string line;
+            while (getline(inFile, line))
             {
-                vector<Appointment> appointments;
-                string line;
-                while (getline(inFile, line))
-                {
-                    stringstream ss(line);
-                    string sid, sname, reason, date, counselor, typeStr;
-                    getline(ss, sid, ',');
+                if (line.empty()) continue;
+
+                Appointment tempAppt;
+                stringstream ss(line);
+                string sid, sname, reason, date, counselor, typeStr;
+
+                // Parse the CSV: studentID,"studentName",reason,preferredDate,assignedCounselor,type
+                getline(ss, sid, ',');
+                if (ss.peek() == '\"') {
+                    ss.ignore(); // skip opening quote
+                    getline(ss, sname, '\"');
+                    ss.ignore(); // skip comma after closing quote
+                } else {
                     getline(ss, sname, ',');
-                    getline(ss, reason, ',');
-                    getline(ss, date, ',');
-                    getline(ss, counselor, ',');  // Add this for assignedCounselor
-                    getline(ss, typeStr);  // type is now the 6th field
-
-
-                    Appointment tempAppt;
-                    strcpy(tempAppt.studentID, sid.c_str());
-                    strcpy(tempAppt.studentName, sname.c_str());
-                    strcpy(tempAppt.reason, reason.c_str());
-                    strcpy(tempAppt.preferredDate, date.c_str());
-                    strcpy(tempAppt.assignedCounselor, counselor.c_str());  // Add this
-                    tempAppt.type = typeStr[0];
-
-
-                    appointments.push_back(tempAppt);
                 }
-                inFile.close();
+                getline(ss, reason, ',');
+                getline(ss, date, ',');
+                getline(ss, counselor, ',');
+                getline(ss, typeStr);
 
+                // Assign to the struct
+                strcpy(tempAppt.studentID, trimString(sid).c_str());
+                strcpy(tempAppt.studentName, trimString(sname).c_str());
+                strcpy(tempAppt.reason, trimString(reason).c_str());
+                strcpy(tempAppt.preferredDate, trimString(date).c_str());
+                strcpy(tempAppt.preferredTime, ""); // No time in CSV
+                strcpy(tempAppt.assignedCounselor, trimString(counselor).c_str());
+                tempAppt.type = trimString(typeStr)[0];
 
-                // PASS 1: Emergencies First (only for assigned students)
-                cout << "\n[ !!! EMERGENCY ALERTS !!! ]" << endl;
-                for (const auto& appt : appointments)
+                appointments.push_back(tempAppt);
+            }
+            inFile.close();
+
+            loadingTransition("Syncing with appointments.csv", 1);
+            clearScreen();
+            cout << "==================================================" << endl;
+            cout << "             PASS 1: EMERGENCY QUEUE              " << endl;
+            cout << "==================================================" << endl;
+
+            cout << "\n[ !!! EMERGENCY WALK-IN QUEUE !!! ]" << endl;
+            bool hasEmergency = false;
+            for (const auto& appt : appointments)
+            {
+                if (appt.type == 'E' || appt.type == 'e')
                 {
-                    if (appt.type == 'E' || appt.type == 'e')
+                    if (strcmp(appt.assignedCounselor, currentCounselor.username) == 0)
                     {
-                        if (strcmp(appt.assignedCounselor, currentCounselor.username) == 0)  // Add this filter
-                        {
-                            foundAny = true;
-                            cout << "STUDENT: " << appt.studentID << " | " << appt.studentName << endl;
-                            cout << "REASON:  " << appt.reason << endl;
-                            cout << "--------------------------------------------------" << endl;
-                        }
-                    }
-                }
-
-
-                // PASS 2: Standard Bookings (only for assigned students)
-                cout << "\n[ STANDARD BOOKINGS ]" << endl;
-                for (const auto& appt : appointments)
-                {
-                    if (appt.type == 'B' || appt.type == 'b')
-                    {
-                        if (strcmp(appt.assignedCounselor, currentCounselor.username) == 0)  // Add this filter
-                        {
-                            foundAny = true;
-                            cout << "DATE:    " << appt.preferredDate << endl;
-                            cout << "STUDENT: " << appt.studentID << " | " << appt.studentName << endl;
-                            cout << "REASON:  " << appt.reason << endl;
-                            cout << "--------------------------------------------------" << endl;
-                        }
+                        foundAny = true;
+                        hasEmergency = true;
+                        // Displaying Date, Time, and Reason
+                        cout << "DATE & TIME : " << appt.preferredDate << " | " << appt.preferredTime << endl;
+                        cout << "STUDENT     : " << appt.studentID << " | " << appt.studentName << endl;
+                        cout << "REASON      : " << appt.reason << endl;
+                        cout << "--------------------------------------------------" << endl;
                     }
                 }
             }
+            if (!hasEmergency) cout << " > No pending emergency cases.\n";
 
-
-            if (!foundAny && !(!inFile))
-                cout << "Queue is currently empty." << endl;
-
+           loadingTransition("Syncing with appointments.csv", 1);
+            clearScreen();
+            cout << "==================================================" << endl;
+            cout << "            PASS 2: NORMAL BOOKINGS QUEUE        " << endl;
+            cout << "==================================================" << endl;
+            cout << "\n[ NORMAL / STANDARD BOOKINGS ]" << endl;
+            bool hasNormal = false;
+            for (const auto& appt : appointments)
+            {
+                if (appt.type == 'B' || appt.type == 'b' || appt.type == 'N' || appt.type == 'n')
+                {
+                    if (strcmp(appt.assignedCounselor, currentCounselor.username) == 0)
+                    {
+                        foundAny = true;
+                        hasNormal = true;
+                        // Displaying Date, Time, and Reason
+                        cout << "DATE & TIME : " << appt.preferredDate << " | " << appt.preferredTime << endl;
+                        cout << "STUDENT     : " << appt.studentID << " | " << appt.studentName << endl;
+                        cout << "REASON      : " << appt.reason << endl;
+                        cout << "--------------------------------------------------" << endl;
+                    }
+                }
+            }
+            if (!hasNormal) cout << " > No pending standard bookings.\n";
 
             cout << "\nPress Enter to return to Dashboard...";
             cin.ignore(1000, '\n');
             cin.get();
             break;
         }
-
 
         case 5: // Wellness Priority List
         {
@@ -1594,4 +1611,3 @@ int main()
     loginMenu();
     return 0;
 }
-
